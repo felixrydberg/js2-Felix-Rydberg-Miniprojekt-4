@@ -522,39 +522,115 @@ function hmrAcceptRun(bundle, id) {
 class Tamagochi {
     constructor(){
         let names = [
-            "Felix",
-            "Tuva",
-            "Ann",
-            "Fredrik",
-            "Maria",
-            "David"
+            'Felix',
+            'Tuva',
+            'Ann',
+            'Fredrik',
+            'Maria',
+            'David'
         ];
         let types = [
-            "Hund",
-            "Kanin",
-            "Katt",
-            "Hamster",
-            "Fladdermus",
-            "Råtta"
+            'Hund',
+            'Kanin',
+            'Katt',
+            'Hamster',
+            'Fladdermus',
+            'Råtta'
         ];
         this.name = names[Math.floor(Math.random() * names.length)];
         this.type = types[Math.floor(Math.random() * types.length)];
-        this.happiens = 5;
-        this.hungry = 5;
+        this.happiness = 5;
+        this.hunger = 5;
+        this.poopcounter = [];
     }
     feed() {
-        if (this.hungry === 0) ;
-        else this.hungry--;
+        if (this.hunger === 0) this.decrementValue();
+        else if (this.hunger === 10) this.die("Starvation");
+        else {
+            this.hunger--;
+            this.poop();
+        }
     }
     play() {
-        if (this.happiens === 10) ;
-        else this.happiens++;
+        if (this.happiness === 10) this.incrementValue();
+        else if (this.happiness === 0) this.die("Boredom");
+        else this.happiness++;
     }
-    minusValue(target, action) {
+    poop() {
+        if (Math.random() < 0.5) {
+            console.log(`${this.name} just pooped, better clean it up :c`);
+            this.poopcounter.push(setInterval(function() {
+                console.log("poop stinky now sadge :(");
+                this.decrementValue();
+            }, 10000));
+        } else console.log(`${this.name} didnt poop :)`);
     }
-    plusValue(target, action) {
+    cleanthepopo() {
+        clearInterval(this.poopcounter[0]);
+        this.poopcounter.splice(0, 1);
+        console.log(this.poopcounter);
+    }
+    incrementValue() {
+        console.log("+ ", this.hunger);
+        this.hunger++;
+        if (this.hunger === 10) this.die("Hunger");
+    }
+    decrementValue() {
+        console.log("- ", this.happiness);
+        this.happiness--;
+        if (this.happiness === 0) this.die("Happiness");
+    }
+    die(reason) {
+        alert(`bro died, you didnt take care of it, Not enough attension to: ${reason}`);
+        window.location.reload();
+    }
+    getData() {
+        let roomStatus;
+        if (this.poopcounter[0]) roomStatus = "Nope";
+        else roomStatus = "Yes";
+        return {
+            name: this.name,
+            type: this.type,
+            hunger: this.hunger,
+            happiness: this.happiness,
+            clean: roomStatus
+        };
     }
 }
+(function() {
+    let player1 = new Tamagochi;
+    let feedbtn = document.querySelector(".feed");
+    feedbtn.addEventListener("click", function() {
+        player1.feed();
+        updateDisplay();
+    });
+    let cleanbtn = document.querySelector(".cleanbtn");
+    cleanbtn.addEventListener("click", function() {
+        player1.cleanthepopo();
+        updateDisplay();
+    });
+    let playbtn = document.querySelector(".play");
+    playbtn.addEventListener('click', function() {
+        player1.play();
+        updateDisplay();
+    });
+    const updateDisplay = ()=>{
+        console.log("updateDisplay");
+        const { name , type , hunger , happiness , clean  } = player1.getData();
+        console.log(name, type, hunger, happiness, clean);
+        let nameDisplay = document.querySelector(".name");
+        nameDisplay.innerHTML = `Name: ${name}`;
+        let typeDisplay = document.querySelector(".type");
+        typeDisplay.innerHTML = `Type: ${type}`;
+        let hungerDisplay = document.querySelector(".hunger");
+        hungerDisplay.innerHTML = `Hunger: ${hunger}`;
+        let happinessDisplay = document.querySelector(".happiness");
+        happinessDisplay.innerHTML = `Happiness: ${happiness}`;
+        let cleanDisplay = document.querySelector(".clean");
+        cleanDisplay.innerHTML = `Is the room clean? ${clean}`;
+    };
+    updateDisplay();
+})();
 
 },{}]},["lpcHr","jeorp"], "jeorp", "parcelRequire477f")
 
